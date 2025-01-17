@@ -1,0 +1,12 @@
+.RowAllBox {
+  padding-left: 2em;
+  padding-right: 2em;
+  text-align: center;
+}
+
+.RowBox {
+  margin-bottom: 1em;
+  margin-top: 1em;
+
+  text-align: center;
+}
