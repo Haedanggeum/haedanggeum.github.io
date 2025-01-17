@@ -12,7 +12,7 @@
     "bootstrap": "^5.3.3",
     "gl": "^8.1.6",
     "jsroot": "^7.8.0",
-    "next": "^15.1.0",
+    "next": "^15.1.4",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.6",
     "react-dom": "^19.0.0"
