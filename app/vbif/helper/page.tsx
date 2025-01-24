@@ -10,6 +10,8 @@ import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import { useState, Dispatch, SetStateAction } from "react";
 
+import { ParticleSelector } from "./beamseletctor";
+
 import { TargetLayerEntry, TargetLayerRow } from "./target-list";
 import Accordion from "react-bootstrap/Accordion";
 
@@ -44,6 +46,8 @@ export default function HelperPage() {
   const [BeamEnergy, setBeamEnergy] = useState(0);
   const [BeamEnergyUnit, setBeamEnergyUnit] = useState("eV");
   const [NBeamOn, setNBeamOn] = useState(0);
+
+  const [BeamText, setBeamText] = useState("");
 
   const [VerboseDetail, setVerboseDetail] = useState(true);
   const [VerboseDetailControl, setVerboseDetailControl] = useState(0);
@@ -92,13 +96,13 @@ export default function HelperPage() {
                   </Col>
                 ))}
               </Row>
-              {props.description ? (
+              {/* {props.description ? (
                 <Row>
                   <Form.Text style={{ textAlign: "left" }}>asdf</Form.Text>
                 </Row>
               ) : (
                 <></>
-              )}
+              )} */}
             </Row>
           </Row>
         </Form.Group>
@@ -138,10 +142,11 @@ export default function HelperPage() {
     "\n# Start Geometry Construction",
     macroTextTargetLayer,
     "\n# Particle Setup",
-    `/gun/particle ${BeamParticle}`,
-    `/gun/ene ${BeamEnergy} ${BeamEnergyUnit}`,
-    "\n# Beam On",
-    NBeamOn ? "/run/beamOn " + NBeamOn : "",
+    BeamText,
+    // `/gun/particle ${BeamParticle}`,
+    // `/gun/ene ${BeamEnergy} ${BeamEnergyUnit}`,
+    // "\n# Beam On",
+    // NBeamOn ? "/run/beamOn " + NBeamOn : "",
   ].join("\n");
 
   const handleDownload = () => {
@@ -182,99 +187,7 @@ export default function HelperPage() {
           <Row className={styles.RowAllBox}>
             <Row className={styles.RowBox}>
               <h3>입자 정보 입력</h3>
-              {/* 방사선 종류 */}
-              <Form.Group as={Row}>
-                <Form.Label column sm={formlsize}>
-                  방사선 종류
-                </Form.Label>
-                <Col sm={formrsize}>
-                  <Form.Select
-                    onChange={v => setBeamParticle(v.currentTarget.value)}
-                  >
-                    {[
-                      { name: "클릭하여 선택", value: undefined },
-                      { name: "양성자(p)", value: "p" },
-                      { name: "전자(e-)", value: "e-" },
-                      { name: "양전자(e+)", value: "e+" },
-                      { name: "중성자(n)", value: "n" },
-                      { name: "감마선(gamma)", value: "gamma" },
-                    ].map(value => (
-                      <option
-                        key={`particle-${value.value}`}
-                        value={value.value}
-                      >
-                        {value.name}
-                      </option>
-                    ))}
-                  </Form.Select>
-                  <Form.Text style={{ textAlign: "left" }}>
-                    입사할 방사선의 종류를 선택
-                  </Form.Text>
-                </Col>
-              </Form.Group>
-              {/* 방사선의 에너지 */}
-              <Form.Group as={Row}>
-                <Form.Label column sm={formlsize}>
-                  방사선 에너지
-                </Form.Label>
-                <Col sm={formrsize}>
-                  <Row>
-                    <Col sm={8}>
-                      <Form.Control
-                        onChange={v =>
-                          setBeamEnergy(Number(v.currentTarget.value) ?? 0)
-                        }
-                      />
-                    </Col>
-                    <Col sm={4}>
-                      <Form.Select
-                        onChange={v => setBeamEnergyUnit(v.currentTarget.value)}
-                      >
-                        {/* eV keV MeV GeV TeV PeV J electronvolt kiloelectronvolt megaelectronvolt gigaelectronvolt teraelectronvolt petaelectronvolt joule */}
-                        {[
-                          { name: "클릭하여 선택", value: undefined },
-                          { name: "eV", value: "eV" },
-                          { name: "keV", value: "keV" },
-                          { name: "MeV", value: "MeV" },
-                          { name: "GeV", value: "GeV" },
-                          { name: "TeV", value: "TeV" },
-                          { name: "PeV", value: "PeV" },
-                          { name: "J", value: "J" },
-                        ].map(value => (
-                          <option
-                            key={`particle-${value.value}`}
-                            value={value.value}
-                          >
-                            {value.name}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </Col>
-                  </Row>
-                  <Form.Text style={{ textAlign: "left" }}>
-                    방사선 입자의 에너지와 에너지의 단위 선택
-                  </Form.Text>
-                </Col>
-              </Form.Group>
-              <Form.Group as={Row}>
-                <Form.Label column sm={formlsize}>
-                  입자의 갯수
-                </Form.Label>
-                <Col sm={formrsize}>
-                  <Row>
-                    <Col>
-                      <Form.Control
-                        onChange={v =>
-                          setNBeamOn(Number(v.currentTarget.value))
-                        }
-                      />
-                    </Col>
-                  </Row>
-                  <Form.Text style={{ textAlign: "left" }}>
-                    입사할 입자의 갯수를 입력
-                  </Form.Text>
-                </Col>
-              </Form.Group>
+              <ParticleSelector setOut={setBeamText} />
             </Row>
             <Row className={styles.RowBox}>
               <h3>표적 정보 입력</h3>
@@ -400,14 +313,14 @@ export default function HelperPage() {
           </Row>
         </Col>
 
-        <Row>
+        {/* <Row>
           <Accordion defaultActiveKey="0">
             <Accordion.Item eventKey="0">
               <Accordion.Header>출력값</Accordion.Header>
               <Accordion.Body>ㅁㄴㅇㄹ</Accordion.Body>
             </Accordion.Item>
           </Accordion>
-        </Row>
+        </Row> */}
       </Row>
     </>
   );
