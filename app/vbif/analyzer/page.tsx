@@ -50,18 +50,45 @@ const RootFileAnalyzer: React.FC = () => {
     // Read the TTree object (assuming it's named 'myTree')
     const ttree = await jsrootFile.readObject("tree_edep");
     const tprofile = await jsrootFile.readObject("tree_profile");
+    const tprimary = await jsrootFile.readObject("tree_primary");
 
     // Perform analysis on the TTree
     // For example, draw a histogram of the 'branchName' branch
     const edephist = await treeDraw(ttree, "edep/1000");
+    const primaryEne = await treeDraw(tprimary, "energy");
     const inciprofile = await treeDraw(tprofile, "posx:posy");
     const inciprofilez = await treeDraw(tprofile, "posz");
+    const inciprofileEne = await treeDraw(tprofile, "energy/1000");
     const incipdgcode = await treeDraw(tprofile, "pdgcode");
 
-    setHistogramTitle(edephist, "HIST;ENERGY[keV];ENTRIES");
-    setHistogramTitle(inciprofile, "HIST;POSX[mm];POSY[mm];ENTRIES");
-    setHistogramTitle(inciprofilez, "HIST;POSZ[mm];ENTRIES");
-    setHistogramTitle(incipdgcode, "pdgcode;code;ENTRIES");
+    const dosehist = await treeDraw(ttree, "dose");
+    const edosehist = await treeDraw(ttree, "doseWeighted");
+
+    setHistogramTitle(edephist, "Energy Deposited;ENERGY[keV];ENTRIES");
+    setHistogramTitle(
+      primaryEne,
+      "Primary Particle Energy;Energy[keV];ENTRIES",
+    );
+    setHistogramTitle(
+      inciprofile,
+      "Incident Particle on Scoring Volume;POSX[mm];POSY[mm];ENTRIES",
+    );
+    setHistogramTitle(
+      inciprofilez,
+      "Incident Particle on Scoring Volume;POSZ[mm];ENTRIES",
+    );
+    setHistogramTitle(
+      inciprofileEne,
+      "Incident Particle on Scoring Volume;Energy[keV];ENTRIES",
+    );
+    setHistogramTitle(
+      incipdgcode,
+      "Incident Particle on Scoring Volume;pdgcode;ENTRIES",
+    );
+
+    setHistogramTitle(dosehist, "Radiation Dose;Dose[Gy];ENTRIES");
+
+    setHistogramTitle(edosehist, "Effective Dose;Effective Dose[Sv];ENTRIES");
 
     // Convert the histogram to an SVG for display
     // const svg = await makeSVG({ object: edephist });
@@ -70,9 +97,14 @@ const RootFileAnalyzer: React.FC = () => {
     // setAnalysisResult(svg);
     console.log(rootdraw);
     await rootdraw("drawingEDEP1", edephist, "logy;gridx;gridy");
+    await rootdraw("drawingPRIMARYene", primaryEne, "logy;gridy");
+    await rootdraw("drawingPROFILEene", inciprofileEne, "logy;gridy");
     await rootdraw("drawingPROFILEXY", inciprofile, "logz");
     await rootdraw("drawingPROFILEZ", inciprofilez, "logy;gridx;gridy");
     await rootdraw("drawingPROFILEPDGCODE", incipdgcode, "logy;gridy");
+
+    await rootdraw("drawingDOSE", dosehist, "logy;gridy");
+    await rootdraw("drawingEFFECTIVEDOSE", edosehist, "logy;gridy");
   };
 
   return (
@@ -117,11 +149,36 @@ const RootFileAnalyzer: React.FC = () => {
       </Col>
       <Col style={{ marginTop: "2em" }} sm={12} md={10} lg={9} xl={9} xxl={9}>
         <h4>분석 결과</h4>
-        <h5>표적층에 입사된 에너지 프로파일 (사건별)</h5>
+        <h5>생성된 일차 입자의 에너지 (일차입자별)</h5>
+        {drawn ? (
+          <div
+            style={{ width: 100 + "%", height: 600 + "px" }}
+            id="drawingPRIMARYene"
+          ></div>
+        ) : (
+          <p style={{ fontSize: "small", color: "grey" }}>
+            분석 한 자료가 없습니다.
+          </p>
+        )}
+        <h5>기록 층에서 손실된 총 에너지(일차입자별)</h5>
         {drawn ? (
           <div
             style={{ width: 100 + "%", height: 600 + "px" }}
             id="drawingEDEP1"
+          ></div>
+        ) : (
+          <p style={{ fontSize: "small", color: "grey" }}>
+            분석 한 자료가 없습니다.
+          </p>
+        )}
+        <h5>
+          기록 층에 입사될 때의 에너지(기록층 바깥에서 생성된 2차입자는 포함,
+          기록층 내부에서 생성된 2차입자는 비포함.)
+        </h5>
+        {drawn ? (
+          <div
+            style={{ width: 100 + "%", height: 600 + "px" }}
+            id="drawingPROFILEene"
           ></div>
         ) : (
           <p style={{ fontSize: "small", color: "grey" }}>
@@ -152,6 +209,7 @@ const RootFileAnalyzer: React.FC = () => {
             분석 한 자료가 없습니다.
           </p>
         )}
+
         <h5>표적층에 입사된 입자의 pdgcode</h5>
         <p>
           정수형기록이며, Low-binedge 가 그에 해당하는 번호임; 22-23 bin 이면
@@ -207,15 +265,37 @@ const RootFileAnalyzer: React.FC = () => {
             분석 한 자료가 없습니다.
           </p>
         )}
+        <h5>기록층에서의 흡수선량</h5>
+        {drawn ? (
+          <div
+            style={{ width: 100 + "%", height: 600 + "px" }}
+            id="drawingDOSE"
+          ></div>
+        ) : (
+          <p style={{ fontSize: "small", color: "grey" }}>
+            분석 한 자료가 없습니다.
+          </p>
+        )}
+        <h5>기록층에서의 유효선량</h5>
+        {drawn ? (
+          <div
+            style={{ width: 100 + "%", height: 600 + "px" }}
+            id="drawingEFFECTIVEDOSE"
+          ></div>
+        ) : (
+          <p style={{ fontSize: "small", color: "grey" }}>
+            분석 한 자료가 없습니다.
+          </p>
+        )}
       </Col>
-      <Col style={{ marginTop: "2em" }} sm={12} md={10} lg={9} xl={9} xxl={9}>
+      {/* <Col style={{ marginTop: "2em" }} sm={12} md={10} lg={9} xl={9} xxl={9}>
         <h4>출력되는 정보</h4>
         <ul>
           <li>입력된 에너지 프로파일</li>
           <li>기록층에서의 입자가 축적한 에너지 스펙트럼(개별 입자별)</li>
           <li>기록층에서의 위치별 에너지 축적량</li>
         </ul>
-      </Col>
+      </Col> */}
     </Row>
   );
 };

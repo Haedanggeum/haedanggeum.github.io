@@ -6,6 +6,7 @@ export interface TargetLayerEntry {
   matname: string;
   thickness: number | undefined;
   unit: string | undefined;
+  weight: number | undefined;
   scored: boolean;
 }
 
@@ -43,6 +44,12 @@ export function TargetLayerRow(props: {
       scored: value,
     });
   }
+  function setWeight(value: string) {
+    props.setValue(props.n, {
+      ...props.value,
+      weight: Number(value),
+    });
+  }
   return (
     <tr style={{ verticalAlign: "middle" }}>
       <td>{props.n + 1}</td>
@@ -73,6 +80,12 @@ export function TargetLayerRow(props: {
         <Form.Check
           type="checkbox"
           onChange={c => setScored(c.currentTarget.checked)}
+        />
+      </td>
+      <td>
+        <Form.Control
+          disabled={!props.value.scored}
+          onChange={c => setWeight(c.currentTarget.value)}
         />
       </td>
     </tr>

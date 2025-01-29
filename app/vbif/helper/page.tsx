@@ -121,6 +121,7 @@ export default function HelperPage() {
         v.thickness +
         " " +
         v.unit +
+        (v.scored ? " " + v.weight : "") +
         " # layer " +
         (i + 1) +
         ", " +
@@ -128,6 +129,26 @@ export default function HelperPage() {
     )
     .join("\n");
 
+  const mactoTextVisualize =
+    TargetLayers.filter(v => !v.scored)
+      .map(
+        (v, i, ar) =>
+          `/vis/geometry/set/colour Target_${i} 0 0 0.5 ${(
+            (i + 1) /
+            ar.length
+          ).toFixed(4)} .4`,
+      )
+      .join("\n") +
+    "\n" +
+    TargetLayers.filter(v => v.scored)
+      .map(
+        (v, i, ar) =>
+          `/vis/geometry/set/colour Scoring_${i} 0 0 1.0 ${(
+            (i + 1) /
+            ar.length
+          ).toFixed(4)} .4`,
+      )
+      .join("\n");
   const outText = [
     macroTextStart,
     VerboseDetail
@@ -141,6 +162,8 @@ export default function HelperPage() {
       : "",
     "\n# Start Geometry Construction",
     macroTextTargetLayer,
+    "\n\n# Geometry Color Setup",
+    mactoTextVisualize,
     "\n# Particle Setup",
     BeamText,
     // `/gun/particle ${BeamParticle}`,
@@ -200,6 +223,7 @@ export default function HelperPage() {
                       <th>두께</th>
                       <th>단위</th>
                       <th>기록층</th>
+                      <th>가중치</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -225,6 +249,7 @@ export default function HelperPage() {
                             thickness: 0,
                             unit: "um",
                             scored: false,
+                            weight: 1.0,
                           },
                         ]);
                       }}
